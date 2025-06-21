@@ -16,7 +16,7 @@ achievements = st.text_area("🏆 Vad är du mest stolt över?")
 
 # Funktion för att anropa Hugging Face LLaMA 3 API
 def call_llama3(prompt):
-    url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+    url = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
     headers = {
         "Authorization": f"Bearer {st.secrets['HF_API_TOKEN']}"
     }

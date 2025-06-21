@@ -34,10 +34,8 @@ def call_llama3(prompt):
 if st.button("🚀 Generera CV"):
     with st.spinner("AI jobbar..."):
 
-        prompt = f"""
-Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
+                prompt = f'''Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
 
----
 {name}
 Stockholm | kontakt@mail.se | linkedin.com/in/profil
 
@@ -55,8 +53,13 @@ Exempel: Ekonomie kandidat – Handelshögskolan (2016–2019)
 KOMPETENSER
 • Lista 5–8 färdigheter
 
-INFORMATION:
-Jobbannons: {job_text}_
+INFORMATION FRÅN ANVÄNDAREN:
+Jobbannons: {job_text}
+Kompetenser: {skills}
+Prestationer: {achievements}
+
+Skriv CV:t i ren text enligt formatet ovan. Använd bara svenska.
+'''
 
 
         st.success("✅ CV genererat!")

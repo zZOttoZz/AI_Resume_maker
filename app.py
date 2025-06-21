@@ -30,7 +30,6 @@ def call_llama3(prompt):
     else:
         return f"Fel från API: {response.status_code} – {response.text}"
 
-# Knapp för att generera CV
 if st.button("🚀 Generera CV"):
     with st.spinner("AI jobbar..."):
         prompt = f"""
@@ -61,13 +60,8 @@ Prestationer: {achievements}
 
 Skriv CV:t i ren text enligt formatet ovan. Använd bara svenska.
 """
+        generated_cv = call_llama3(prompt)
 
-        result = call_llama3(prompt)
         st.success("✅ CV genererat!")
-        st.markdown("### ✨ Resultat:")
-        st.code(result, language="markdown")
-
-        generated_cv = response['choices'][0]['message']['content']
-        st.success("✅ Klart!")
         st.markdown("### ✨ Ditt genererade CV:")
         st.code(generated_cv, language='markdown')

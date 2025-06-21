@@ -30,11 +30,12 @@ def call_llama3(prompt):
     else:
         return f"❌ API-fel ({response.status_code}): {response.text}"
 
-# Knapp för att generera CV
+# När användaren klickar på knappen
 if st.button("🚀 Generera CV"):
     with st.spinner("AI jobbar..."):
 
-                prompt = f'''Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
+        # Prompten till modellen
+        prompt = f'''Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
 
 {name}
 Stockholm | kontakt@mail.se | linkedin.com/in/profil
@@ -60,6 +61,15 @@ Prestationer: {achievements}
 
 Skriv CV:t i ren text enligt formatet ovan. Använd bara svenska.
 '''
+
+        # Anropa AI:n
+        generated_cv = call_llama3(prompt)
+
+        # Visa resultat
+        st.success("✅ CV genererat!")
+        st.markdown("### ✨ Ditt genererade CV:")
+        st.code(generated_cv, language='markdown')
+
 
 
         st.success("✅ CV genererat!")

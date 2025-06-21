@@ -14,7 +14,7 @@ role = st.text_input("🎓 Din nuvarande roll")
 skills = st.text_area("🛠️ Vad är du bra på?")
 achievements = st.text_area("🏆 Vad är du mest stolt över?")
 
-# Funktion för att anropa Hugging Face API
+# Funktion för att anropa Hugging Face LLaMA 3 API
 def call_llama3(prompt):
     url = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"
     headers = {
@@ -25,13 +25,15 @@ def call_llama3(prompt):
     if response.status_code == 200:
         try:
             return response.json()[0]["generated_text"]
-        except Exception:
-            return response.json()
+        except Exception as e:
+            return f"⚠️ Kunde inte läsa svaret från modellen: {e}"
     else:
-        return f"Fel från API: {response.status_code} – {response.text}"
+        return f"❌ API-fel ({response.status_code}): {response.text}"
 
+# Knapp för att generera CV
 if st.button("🚀 Generera CV"):
     with st.spinner("AI jobbar..."):
+
         prompt = f"""
 Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
 
@@ -54,13 +56,8 @@ KOMPETENSER
 • Lista 5–8 färdigheter
 
 INFORMATION:
-Jobbannons: {job_text}
-Kompetenser: {skills}
-Prestationer: {achievements}
+Jobbannons: {job_text}_
 
-Skriv CV:t i ren text enligt formatet ovan. Använd bara svenska.
-"""
-        generated_cv = call_llama3(prompt)
 
         st.success("✅ CV genererat!")
         st.markdown("### ✨ Ditt genererade CV:")

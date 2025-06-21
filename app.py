@@ -1,59 +1,71 @@
 import streamlit as st
-import openai
+import requests
 
+# Sidinställningar
 st.set_page_config(page_title="AI Resume Optimizer", layout="centered")
 
-st.title("📄 AI Resume Optimizer")
-st.markdown("**Ladda upp jobbannonsen och svara på några enkla frågor – vi skapar ett AI-genererat CV i mallformat.**")
+st.title("📄 AI Resume Optimizer (Gratis via Hugging Face)")
+st.markdown("Fyll i formuläret nedan så genererar AI ett CV åt dig baserat på en fast mall.")
 
-# API-nyckel (från .streamlit/secrets.toml)
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-# Inputs från användaren
-job_text = st.text_area("📋 Klistra in jobbannonsen här")
+# Input-fält
+job_text = st.text_area("📋 Klistra in jobbannonsen")
 name = st.text_input("👤 Ditt namn")
 role = st.text_input("🎓 Din nuvarande roll")
 skills = st.text_area("🛠️ Vad är du bra på?")
 achievements = st.text_area("🏆 Vad är du mest stolt över?")
 
-if st.button("🚀 Generera CV"):
-    with st.spinner("Skapar ditt CV..."):
+# Funktion för att anropa Hugging Face API
+def call_llama3(prompt):
+    url = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"
+    headers = {
+        "Authorization": f"Bearer {st.secrets['HF_API_TOKEN']}"
+    }
+    response = requests.post(url, headers=headers, json={"inputs": prompt})
 
+    if response.status_code == 200:
+        try:
+            return response.json()[0]["generated_text"]
+        except Exception:
+            return response.json()
+    else:
+        return f"Fel från API: {response.status_code} – {response.text}"
+
+# Knapp för att generera CV
+if st.button("🚀 Generera CV"):
+    with st.spinner("AI jobbar..."):
         prompt = f"""
-Du är en professionell CV-skrivare. Använd informationen nedan för att skapa ett CV enligt denna struktur:
+Du är en professionell CV-skapare. Använd informationen nedan för att skriva ett CV enligt den här mallen:
 
 ---
 {name}
 Stockholm | kontakt@mail.se | linkedin.com/in/profil
 
 PROFIL
-Skriv en 2-3 meningars summering av kandidatens bakgrund, baserat på deras nuvarande roll, prestationer och kompetenser.
+En 2-3 meningars sammanfattning av kandidatens bakgrund och styrkor.
 
 ARBETSLIVSERFARENHET
 {role} – Företag, Stad (År–År)
-• 2–3 prestationer baserat på kandidatens input och jobbannonsen.
+• Punkt 1
+• Punkt 2
 
 UTBILDNING
-Exempel: Ekonomie kandidat – Stockholms universitet (2016–2019)
+Exempel: Ekonomie kandidat – Handelshögskolan (2016–2019)
 
 KOMPETENSER
-• Lista 5–8 matchande kompetenser från både jobbannons och kandidatens svar.
+• Lista 5–8 färdigheter
 
-Jobbannons:
-{job_text}
+INFORMATION:
+Jobbannons: {job_text}
+Kompetenser: {skills}
+Prestationer: {achievements}
 
-Kandidatens input:
-- Kompetenser: {skills}
-- Prestationer: {achievements}
-
-Generera CV:t i ren text enligt formatet ovan.
+Skriv CV:t i ren text enligt formatet ovan. Använd bara svenska.
 """
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
-        )
+        result = call_llama3(prompt)
+        st.success("✅ CV genererat!")
+        st.markdown("### ✨ Resultat:")
+        st.code(result, language="markdown")
 
         generated_cv = response['choices'][0]['message']['content']
         st.success("✅ Klart!")

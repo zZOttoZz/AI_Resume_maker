@@ -20,7 +20,15 @@ def call_llama3(prompt):
     headers = {
         "Authorization": f"Bearer {st.secrets['HF_API_TOKEN']}"
     }
-    response = requests.post(url, headers=headers, json={"inputs": prompt})
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json={"inputs": prompt},
+            timeout=30,
+        )
+    except requests.Timeout:
+        return "⌛ Förfrågan till AI-modellen tog för lång tid. Försök igen senare."
 
     if response.status_code == 200:
         try:
